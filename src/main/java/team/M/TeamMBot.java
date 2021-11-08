@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.utils.*;
 import net.dv8tion.jda.api.utils.cache.*;
 
 import javax.security.auth.login.*;
+import java.io.*;
 
 
 public class TeamMBot {
@@ -18,9 +19,14 @@ public class TeamMBot {
     public static String prefix;
 
 
-    public static void main(String[] args) throws LoginException {
+    public static void main(String[] args) throws LoginException, IOException {
 
-        String token = "ODE2MTEwMDYwNjU2NTI1MzYy.YD2LuQ.eW3TQmZW_jGdZOjLQ3oUqFkwM6I";
+        //place where file is located. double backward slash should be used.
+        File file = new File("/home/luc/Documents/computing/DiscordBot/token");
+
+        BufferedReader fileReader = new BufferedReader(new FileReader(file));
+
+        String token = fileReader.readLine();
 
         prefix = "~";
 
