@@ -1,5 +1,6 @@
 package listeners;
 
+import Command.Command;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -15,6 +16,7 @@ import java.util.*;
 import java.util.Objects;
 
 import team.M.TeamMBot.*;
+import Command.*;
 import vote.Vote;
 
 /*
@@ -28,6 +30,7 @@ public class HelloListener extends ListenerAdapter {
 
     ArrayList<Vote> activeVotes = new ArrayList<Vote>();
 
+
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 
         String messageSent = event.getMessage().getContentRaw();
@@ -37,14 +40,39 @@ public class HelloListener extends ListenerAdapter {
             event.getChannel().sendMessage("J'aimerais que Steak se la ramène et me fasse un logo ou kkchose pcq là juis pogné avec la face a Hamdache :'(").queue();
         }
 
+        if(messageSent.substring(0, 3).equalsIgnoreCase(TeamMBot.prefix + "tb")){
+            String message = event.getMessage().toString();
 
+            if(message.charAt(3) != ' '){
+                event.getChannel().sendMessage("There was an error in command. Please respect the syntax `~tb " +
+                        "<command> <arg0> <arg1> ... <argN>` Char = " + message).queue();
+            }
+            else{
+                ArrayList<String> commandAndArgs = new ArrayList<String>(Arrays.asList(message.substring(4,
+                        message.length()).split(" ")));
+                switch (commandAndArgs.get(0)){
+                    case "help":
+                        HelpCommand helpCommand = new HelpCommand(commandAndArgs, event);
+                        try {
+                            helpCommand.execute();
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                        }
+                        break;
 
-        if(messageSent.equalsIgnoreCase(TeamMBot.prefix + "help")) {
-            event.getMessage().delete().queue();
-            event.getChannel().sendMessage("Commands:").queue();
-            event.getChannel().sendMessage("- help").queue();
-            event.getChannel().sendMessage("- announce").queue();
+                    case "vote":
+                        Command command;
+                        break;
+                }
+            }
         }
+
+//        if(messageSent.equalsIgnoreCase(TeamMBot.prefix + "help")) {
+//            event.getMessage().delete().queue();
+//            event.getChannel().sendMessage("Commands:").queue();
+//            event.getChannel().sendMessage("- help").queue();
+//            event.getChannel().sendMessage("- announce").queue();
+//        }
 
         if(messageSent.split(" ")[0].equalsIgnoreCase(TeamMBot.prefix + "vote")){
             String voteCommand = event.getMessage().getContentDisplay();
