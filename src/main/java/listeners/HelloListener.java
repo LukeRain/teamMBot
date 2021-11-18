@@ -17,7 +17,6 @@ import java.util.Objects;
 
 import team.M.TeamMBot.*;
 import Command.*;
-import vote.Vote;
 
 /*
 Channels ids:
@@ -27,8 +26,6 @@ teachershatting: 780840656398319696
  */
 
 public class HelloListener extends ListenerAdapter {
-
-    ArrayList<Vote> activeVotes = new ArrayList<Vote>();
 
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
@@ -41,7 +38,7 @@ public class HelloListener extends ListenerAdapter {
         }
 
         if(messageSent.substring(0, 3).equalsIgnoreCase(TeamMBot.prefix + "tb")){
-            String message = event.getMessage().toString();
+            String message = event.getMessage().getContentRaw();
 
             if(message.charAt(3) != ' '){
                 event.getChannel().sendMessage("There was an error in command. Please respect the syntax `~tb " +
@@ -50,6 +47,7 @@ public class HelloListener extends ListenerAdapter {
             else{
                 ArrayList<String> commandAndArgs = new ArrayList<String>(Arrays.asList(message.substring(4,
                         message.length()).split(" ")));
+                        List<String> args = commandAndArgs.subList(1, commandAndArgs.size());
                 switch (commandAndArgs.get(0)){
                     case "help":
                         HelpCommand helpCommand = new HelpCommand(commandAndArgs, event);
@@ -60,42 +58,15 @@ public class HelloListener extends ListenerAdapter {
                         }
                         break;
 
-                    case "vote":
-                        Command command;
+                    case "play":
+                        PlayCommand playCommand = new PlayCommand(args, event);
+                        try {
+                            playCommand.execute();
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                        }
                         break;
                 }
-            }
-        }
-
-//        if(messageSent.equalsIgnoreCase(TeamMBot.prefix + "help")) {
-//            event.getMessage().delete().queue();
-//            event.getChannel().sendMessage("Commands:").queue();
-//            event.getChannel().sendMessage("- help").queue();
-//            event.getChannel().sendMessage("- announce").queue();
-//        }
-
-        if(messageSent.split(" ")[0].equalsIgnoreCase(TeamMBot.prefix + "vote")){
-            String voteCommand = event.getMessage().getContentDisplay();
-            ArrayList<String> decomposedCommand = new ArrayList<String>(Arrays.asList(voteCommand.split(" ")));
-
-            // Display vote status
-            if(Objects.equals(decomposedCommand.get(1), "status")){
-                for(Vote singleVote:activeVotes){
-                    String result = singleVote.getTitle() + "\n" + "\n" + singleVote.getResult();
-                    event.getChannel().sendMessage(result).queue();
-                }
-            }
-
-            else {
-                ArrayList<String> voteChoices = new ArrayList<String>(decomposedCommand.subList(1, decomposedCommand.size()));
-
-                // Collecting vote choices
-                //            for(int i=1; i<voteChoices.size(); i++){
-                //                event.getChannel().sendMessage(voteChoices.get(1)).queue();
-                //            }
-
-                // Create vote
-                activeVotes.add(new Vote("My super vote2", voteChoices));
             }
         }
 
